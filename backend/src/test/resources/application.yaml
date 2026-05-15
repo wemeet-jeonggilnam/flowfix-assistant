@@ -5,3 +5,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+  flyway:
+    enabled: false
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+rag-engine:
+  base-url: http://localhost:8003
