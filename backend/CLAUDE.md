@@ -1,4 +1,4 @@
-# FlowFix Assistant
+# FlowFix Assistant - Backend
 
 Spring Boot 기반 백엔드 애플리케이션 (com.wemeet)
 
@@ -15,7 +15,7 @@ Spring Boot 기반 백엔드 애플리케이션 (com.wemeet)
 Base package: `com.wemeet.flowfixassistant` (도메인별 4계층 DDD 구조)
 
 ```
-backend/src/main/kotlin/com/wemeet/flowfixassistant/
+src/main/kotlin/com/wemeet/flowfixassistant/
 ├── chat/
 │   ├── presentation/           # ChatController, dto/
 │   ├── application/            # ChatService, TokenUsageService, RagClient
@@ -24,7 +24,7 @@ backend/src/main/kotlin/com/wemeet/flowfixassistant/
 │   │   ├── enums/              # ChatRole
 │   │   ├── vo/                 # TokenUsageInfo (@Embeddable 값 객체)
 │   │   └── repository/         # 순수 인터페이스 (JPA 의존 없음)
-│   └── infrastructure/         # Jpa*Repository (JpaRepository 상속, DIP 구현체)
+│   └── infrastructure/         # Jpa*Repository, WebClientRagClient (DIP 구현체)
 ├── user/
 │   ├── domain/
 │   │   ├── model/              # AssistantUser
@@ -35,9 +35,9 @@ backend/src/main/kotlin/com/wemeet/flowfixassistant/
 │   └── infrastructure/config/  # CorsConfig, RestClientConfig, SecurityConfig, WebSocketConfig
 └── FlowfixAssistantApplication.kt
 
-backend/src/main/resources/application.yaml
-backend/src/test/kotlin/com/wemeet/flowfixassistant/
-backend/src/test/resources/application.yaml
+src/main/resources/application.yaml
+src/test/kotlin/com/wemeet/flowfixassistant/
+src/test/resources/application.yaml
 ```
 
 ## Build & Test
@@ -52,7 +52,11 @@ backend/src/test/resources/application.yaml
 
 - 한국어 커밋 메시지 및 코드 주석 사용
 - Kotlin 코딩 컨벤션 준수
-- JPA Entity에는 `data class` 대신 일반 `class` 사용
+- JPA Entity에는 `data class` 대신 일반 `class` 사용 (VO/@Embeddable은 `data class` 허용)
 - `-Xjsr305=strict` 활성화: null-safety 엄격 적용
 - 테스트는 JUnit 5 + `@SpringBootTest` 기반
 - REST API는 Spring Web MVC 패턴 (Controller → Service → Repository)
+- 토큰 사용량 기록은 `REQUIRES_NEW` 트랜잭션으로 분리
+- 연관관계 편의 메서드는 `@OneToMany` 쪽(`Conversation.addMessage()`)에서 양방향 동기화
+- 도메인 엔티티 생성은 `companion object` 팩토리 메서드 사용 (`ofUser`, `ofAssistant`)
+- DTO 네이밍: `<도메인><행위>Request/Response` (예: `ChatSendRequest`, `ConversationListResponse`)
