@@ -31,14 +31,21 @@ backend/src/main/kotlin/com/wemeet/flowfixassistant/
 │       ├── persistence/jpa/    # JpaConversationRepository, JpaTokenUsageLogRepository
 │       └── WebClientRagClient.kt
 ├── user/
+│   ├── presentation/           # AuthController, dto/
+│   ├── application/
+│   │   ├── dto/                # SignUpCommand, LoginCommand, AuthResult
+│   │   ├── TokenProvider.kt    # 토큰 생성/검증 인터페이스 (DIP)
+│   │   └── UserService.kt
 │   ├── domain/
 │   │   ├── model/              # AssistantUser
 │   │   └── repository/         # 순수 인터페이스 (JPA 의존 없음)
 │   └── infrastructure/
-│       └── persistence/jpa/    # JpaAssistantUserRepository
+│       ├── persistence/jpa/    # JpaAssistantUserRepository
+│       └── security/           # JwtTokenProvider, JwtAuthenticationFilter, UserPrincipal, CustomUserDetailsService
 ├── common/
+│   ├── domain/                 # BaseEntity (@MappedSuperclass)
 │   ├── presentation/           # ApiResponse, GlobalExceptionHandler
-│   └── infrastructure/config/  # CorsConfig, RestClientConfig, SecurityConfig, WebSocketConfig
+│   └── infrastructure/config/  # CorsConfig, JpaAuditingConfig, RestClientConfig, SecurityConfig, WebSocketConfig
 └── FlowfixAssistantApplication.kt
 
 backend/src/main/resources/application.yaml

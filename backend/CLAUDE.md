@@ -31,14 +31,21 @@ src/main/kotlin/com/wemeet/flowfixassistant/
 │       ├── persistence/jpa/    # JpaConversationRepository, JpaTokenUsageLogRepository
 │       └── WebClientRagClient.kt
 ├── user/
+│   ├── presentation/           # AuthController, dto/
+│   ├── application/
+│   │   ├── dto/                # SignUpCommand, LoginCommand, AuthResult
+│   │   ├── TokenProvider.kt    # 토큰 생성/검증 인터페이스 (DIP)
+│   │   └── UserService.kt
 │   ├── domain/
 │   │   ├── model/              # AssistantUser
 │   │   └── repository/         # 순수 인터페이스 (JPA 의존 없음)
 │   └── infrastructure/
-│       └── persistence/jpa/    # JpaAssistantUserRepository
+│       ├── persistence/jpa/    # JpaAssistantUserRepository
+│       └── security/           # JwtTokenProvider, JwtAuthenticationFilter, UserPrincipal, CustomUserDetailsService
 ├── common/
+│   ├── domain/                 # BaseEntity (@MappedSuperclass)
 │   ├── presentation/           # ApiResponse, GlobalExceptionHandler
-│   └── infrastructure/config/  # CorsConfig, RestClientConfig, SecurityConfig, WebSocketConfig
+│   └── infrastructure/config/  # CorsConfig, JpaAuditingConfig, RestClientConfig, SecurityConfig, WebSocketConfig
 └── FlowfixAssistantApplication.kt
 
 src/main/resources/application.yaml
@@ -63,8 +70,9 @@ presentation → application → domain ← infrastructure
 - **presentation**: application, domain 참조 가능. infrastructure 직접 참조 금지
 - **application**: domain 참조 가능. presentation, infrastructure 직접 참조 금지
 - **domain**: 어떤 계층도 참조하지 않음 (순수 도메인, 외부 의존성 없음)
-- **infrastructure**: domain 참조 가능 (DIP로 domain 인터페이스 구현)
+- **infrastructure**: domain, application 인터페이스 참조 가능 (DIP로 인터페이스 구현)
 - 역방향 의존 금지: domain → application, application → presentation 등
+- `common` 패키지는 특정 도메인 모듈에 의존 금지 (도메인 무관 공통 모듈)
 
 ## Conventions
 
@@ -87,3 +95,6 @@ presentation → application → domain ← infrastructure
 - API 응답은 `T.toSuccessResponse()` 확장 함수 사용 (`ResponseEntity<ApiResponse<T>>` 반환)
 - Request 검증은 `@Valid` + Jakarta Validation 어노테이션 사용 (`@NotBlank`, `@Size` 등)
 - Service의 public 메서드에는 KDoc 주석 작성: 메서드 설명, `@param`, `@return` 포함 (한국어)
+- 외부 인프라 인터페이스(TokenProvider, RagClient 등)는 `application/` 계층에 정의, 구현체는 `infrastructure/`에 위치 (DIP)
+- 보안 인프라 클래스(JWT, UserDetails 등)는 해당 도메인의 `infrastructure/security/`에 위치, `common`에 두지 않음
+- JWT 시크릿 등 민감 설정은 환경변수로 주입 (`${JWT_SECRET}`), 소스코드에 기본값 하드코딩 금지
