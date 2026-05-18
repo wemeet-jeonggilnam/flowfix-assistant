@@ -16,7 +16,7 @@ Base package: `com.wemeet.flowfixassistant` (도메인별 4계층 DDD 구조)
 
 ```
 src/main/kotlin/com/wemeet/flowfixassistant/
-├── chat/
+├── conversation/                       # 애그리거트 루트: Conversation
 │   ├── presentation/           # ChatController, dto/
 │   ├── application/
 │   │   ├── service/            # ChatService, TokenUsageService
@@ -27,12 +27,15 @@ src/main/kotlin/com/wemeet/flowfixassistant/
 │   │   ├── enums/              # ChatRole
 │   │   ├── vo/                 # TokenUsageInfo (@Embeddable 값 객체)
 │   │   └── repository/         # 순수 인터페이스 (JPA 의존 없음)
-│   └── infrastructure/         # Jpa*Repository, WebClientRagClient (DIP 구현체)
+│   └── infrastructure/
+│       ├── persistence/jpa/    # JpaConversationRepository, JpaTokenUsageLogRepository
+│       └── WebClientRagClient.kt
 ├── user/
 │   ├── domain/
 │   │   ├── model/              # AssistantUser
 │   │   └── repository/         # 순수 인터페이스 (JPA 의존 없음)
-│   └── infrastructure/         # JpaAssistantUserRepository (DIP 구현체)
+│   └── infrastructure/
+│       └── persistence/jpa/    # JpaAssistantUserRepository
 ├── common/
 │   ├── presentation/           # ApiResponse, GlobalExceptionHandler
 │   └── infrastructure/config/  # CorsConfig, RestClientConfig, SecurityConfig, WebSocketConfig
