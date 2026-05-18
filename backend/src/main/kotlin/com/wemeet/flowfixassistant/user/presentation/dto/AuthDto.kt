@@ -1,18 +1,24 @@
 package com.wemeet.flowfixassistant.user.presentation.dto
 
-import com.wemeet.flowfixassistant.user.domain.model.AssistantUser
+import com.wemeet.flowfixassistant.user.application.dto.AuthResult
+import com.wemeet.flowfixassistant.user.application.dto.LoginCommand
+import com.wemeet.flowfixassistant.user.application.dto.SignUpCommand
 import jakarta.validation.constraints.NotBlank
 
 data class SignUpRequest(
     @field:NotBlank(message = "사용자명은 필수입니다.")
     val username: String,
     val displayName: String? = null,
-)
+) {
+    fun toCommand() = SignUpCommand(username = username, displayName = displayName)
+}
 
 data class LoginRequest(
     @field:NotBlank(message = "사용자명은 필수입니다.")
     val username: String,
-)
+) {
+    fun toCommand() = LoginCommand(username = username)
+}
 
 data class TokenResponse(
     val accessToken: String,
@@ -20,8 +26,8 @@ data class TokenResponse(
     val role: String,
 ) {
     companion object {
-        fun of(user: AssistantUser, token: String): TokenResponse {
-            return TokenResponse(accessToken = token, username = user.username, role = user.role)
+        fun from(result: AuthResult): TokenResponse {
+            return TokenResponse(accessToken = result.accessToken, username = result.username, role = result.role)
         }
     }
 }

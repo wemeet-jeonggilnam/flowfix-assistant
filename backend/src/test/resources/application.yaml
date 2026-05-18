@@ -12,5 +12,8 @@ spring:
       host: localhost
       port: 6379
 
+jwt:
+  secret: flowfix-test-secret-key-must-be-at-least-256-bits-long-here!!
+
 rag-engine:
   base-url: http://localhost:8003

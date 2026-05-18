@@ -1,5 +1,6 @@
-package com.wemeet.flowfixassistant.common.infrastructure.security
+package com.wemeet.flowfixassistant.user.infrastructure.security
 
+import com.wemeet.flowfixassistant.user.application.TokenProvider
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
@@ -10,17 +11,17 @@ import javax.crypto.SecretKey
 
 @Component
 class JwtTokenProvider(
-    @Value("\${jwt.secret:flowfix-default-secret-key-must-be-at-least-256-bits-long!!}")
+    @Value("\${jwt.secret}")
     private val secret: String,
 
     @Value("\${jwt.expiration:86400000}")
     private val expirationMs: Long,
-) {
+) : TokenProvider {
     private val key: SecretKey by lazy {
         Keys.hmacShaKeyFor(secret.toByteArray())
     }
 
-    fun generateToken(username: String, role: String): String {
+    override fun generateToken(username: String, role: String): String {
         val now = Date()
         return Jwts.builder()
             .subject(username)
@@ -31,11 +32,11 @@ class JwtTokenProvider(
             .compact()
     }
 
-    fun getUsername(token: String): String {
+    override fun getUsername(token: String): String {
         return parseClaims(token).subject
     }
 
-    fun isValid(token: String): Boolean {
+    override fun isValid(token: String): Boolean {
         return try {
             val claims = parseClaims(token)
             !claims.expiration.before(Date())

@@ -1,5 +1,6 @@
-package com.wemeet.flowfixassistant.common.infrastructure.security
+package com.wemeet.flowfixassistant.user.infrastructure.security
 
+import com.wemeet.flowfixassistant.user.application.TokenProvider
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -11,7 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 
 @Component
 class JwtAuthenticationFilter(
-    private val jwtTokenProvider: JwtTokenProvider,
+    private val tokenProvider: TokenProvider,
     private val userDetailsService: UserDetailsService,
 ) : OncePerRequestFilter() {
 
@@ -21,8 +22,8 @@ class JwtAuthenticationFilter(
         filterChain: FilterChain,
     ) {
         val token = resolveToken(request)
-        if (token != null && jwtTokenProvider.isValid(token)) {
-            val username = jwtTokenProvider.getUsername(token)
+        if (token != null && tokenProvider.isValid(token)) {
+            val username = tokenProvider.getUsername(token)
             val userDetails = userDetailsService.loadUserByUsername(username)
             val authentication = UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.authorities

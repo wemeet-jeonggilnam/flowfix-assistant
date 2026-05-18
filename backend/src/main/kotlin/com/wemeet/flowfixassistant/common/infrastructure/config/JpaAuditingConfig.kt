@@ -1,6 +1,6 @@
 package com.wemeet.flowfixassistant.common.infrastructure.config
 
-import com.wemeet.flowfixassistant.common.infrastructure.security.UserPrincipal
+import com.wemeet.flowfixassistant.user.infrastructure.security.UserPrincipal
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.domain.AuditorAware

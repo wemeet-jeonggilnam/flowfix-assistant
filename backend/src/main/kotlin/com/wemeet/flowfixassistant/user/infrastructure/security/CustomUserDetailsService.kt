@@ -1,6 +1,5 @@
-package com.wemeet.flowfixassistant.user.application
+package com.wemeet.flowfixassistant.user.infrastructure.security
 
-import com.wemeet.flowfixassistant.common.infrastructure.security.UserPrincipal
 import com.wemeet.flowfixassistant.user.domain.repository.AssistantUserRepository
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService

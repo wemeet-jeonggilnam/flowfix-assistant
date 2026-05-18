@@ -1,4 +1,4 @@
-package com.wemeet.flowfixassistant.common.infrastructure.security
+package com.wemeet.flowfixassistant.user.infrastructure.security
 
 import com.wemeet.flowfixassistant.user.domain.model.AssistantUser
 import org.springframework.security.core.GrantedAuthority

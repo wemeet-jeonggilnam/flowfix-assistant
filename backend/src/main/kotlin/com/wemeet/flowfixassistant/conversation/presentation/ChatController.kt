@@ -2,7 +2,7 @@ package com.wemeet.flowfixassistant.conversation.presentation
 
 import com.wemeet.flowfixassistant.conversation.application.service.ChatService
 import com.wemeet.flowfixassistant.conversation.presentation.dto.*
-import com.wemeet.flowfixassistant.common.infrastructure.security.UserPrincipal
+import com.wemeet.flowfixassistant.user.infrastructure.security.UserPrincipal
 import com.wemeet.flowfixassistant.common.presentation.ApiResponse
 import com.wemeet.flowfixassistant.common.presentation.toSuccessResponse
 import jakarta.validation.Valid

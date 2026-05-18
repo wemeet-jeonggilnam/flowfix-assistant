@@ -1,6 +1,6 @@
 package com.wemeet.flowfixassistant.common.infrastructure.config
 
-import com.wemeet.flowfixassistant.common.infrastructure.security.JwtAuthenticationFilter
+import com.wemeet.flowfixassistant.user.infrastructure.security.JwtAuthenticationFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
