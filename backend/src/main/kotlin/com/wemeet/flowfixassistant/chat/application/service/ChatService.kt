@@ -1,6 +1,7 @@
-package com.wemeet.flowfixassistant.chat.application
+package com.wemeet.flowfixassistant.chat.application.service
 
-import com.wemeet.flowfixassistant.chat.presentation.dto.*
+import com.wemeet.flowfixassistant.chat.application.RagClient
+import com.wemeet.flowfixassistant.chat.application.dto.*
 import com.wemeet.flowfixassistant.chat.domain.model.*
 import com.wemeet.flowfixassistant.chat.domain.repository.ConversationRepository
 import org.springframework.stereotype.Service
@@ -14,11 +15,11 @@ class ChatService(
     private val ragClient: RagClient,
 ) {
 
-    fun chat(request: ChatSendRequest, userId: Long): ChatSendResponse {
-        val conversation = getOrCreateConversation(request.conversationId, userId)
+    fun chat(command: ChatSendCommand, userId: Long): ChatSendResult {
+        val conversation = getOrCreateConversation(command.conversationId, userId)
 
         // 사용자 메시지 저장 (dirty checking)
-        conversation.addMessage(ChatMessage.ofUser(conversation, request.message))
+        conversation.addMessage(ChatMessage.ofUser(conversation, command.message))
 
         // 대화 이력 조회 (최근 10개)
         val history = conversation.recentMessages()
@@ -26,7 +27,7 @@ class ChatService(
 
         // RAG Engine 호출
         val ragResponse = ragClient.query(
-            RagRequest(query = request.message, conversationHistory = history)
+            RagRequest(query = command.message, conversationHistory = history)
         )
 
         // AI 응답 메시지 저장 (dirty checking)
@@ -43,31 +44,18 @@ class ChatService(
         // 토큰 사용량 기록 (REQUIRES_NEW)
         tokenUsageService.record(userId, ragResponse.tokenUsage)
 
-        return ChatSendResponse.of(conversation, aiMessage, ragResponse.tokenUsage)
+        return ChatSendResult(conversation = conversation, aiMessage = aiMessage, tokenUsage = ragResponse.tokenUsage)
     }
 
     @Transactional(readOnly = true)
-    fun getConversations(userId: Long): List<ConversationListResponse> {
-        return conversationRepository.findByUserIdOrderByUpdatedAtDesc(userId).map {
-            ConversationListResponse(id = it.id, title = it.title, updatedAt = it.updatedAt)
-        }
+    fun getConversations(userId: Long): List<Conversation> {
+        return conversationRepository.findByUserIdOrderByUpdatedAtDesc(userId)
     }
 
     @Transactional(readOnly = true)
-    fun getMessages(conversationId: Long): List<MessageListResponse> {
-        val conversation = conversationRepository.findById(conversationId).orElseThrow {
+    fun getMessages(conversationId: Long): Conversation {
+        return conversationRepository.findById(conversationId).orElseThrow {
             IllegalArgumentException("대화를 찾을 수 없습니다: $conversationId")
-        }
-        return conversation.messages.map { msg ->
-            MessageListResponse(
-                id = msg.id,
-                role = msg.role.name,
-                content = msg.content,
-                sources = msg.sources.map {
-                    SourceInfo(it.sourceType, it.sourceName, it.sourceSection, it.relevanceScore, it.snippet)
-                },
-                createdAt = msg.createdAt,
-            )
         }
     }
 

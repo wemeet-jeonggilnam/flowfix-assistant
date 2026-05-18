@@ -1,8 +1,8 @@
 package com.wemeet.flowfixassistant.chat.infrastructure
 
 import com.wemeet.flowfixassistant.chat.application.RagClient
-import com.wemeet.flowfixassistant.chat.presentation.dto.RagRequest
-import com.wemeet.flowfixassistant.chat.presentation.dto.RagResponse
+import com.wemeet.flowfixassistant.chat.application.dto.RagRequest
+import com.wemeet.flowfixassistant.chat.application.dto.RagResponse
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient

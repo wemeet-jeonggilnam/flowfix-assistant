@@ -1,4 +1,4 @@
-package com.wemeet.flowfixassistant.chat.presentation.dto
+package com.wemeet.flowfixassistant.chat.application.dto
 
 data class RagRequest(
     val query: String,

@@ -1,4 +1,4 @@
-package com.wemeet.flowfixassistant.chat.presentation.dto
+package com.wemeet.flowfixassistant.chat.application.dto
 
 import com.wemeet.flowfixassistant.chat.domain.model.ChatMessage
 import com.wemeet.flowfixassistant.chat.domain.model.MessageSource

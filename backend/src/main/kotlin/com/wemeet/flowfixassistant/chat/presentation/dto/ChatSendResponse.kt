@@ -1,7 +1,6 @@
 package com.wemeet.flowfixassistant.chat.presentation.dto
 
-import com.wemeet.flowfixassistant.chat.domain.model.ChatMessage
-import com.wemeet.flowfixassistant.chat.domain.model.Conversation
+import com.wemeet.flowfixassistant.chat.application.dto.ChatSendResult
 import java.time.LocalDateTime
 
 data class ChatSendResponse(
@@ -13,12 +12,12 @@ data class ChatSendResponse(
     val createdAt: LocalDateTime,
 ) {
     companion object {
-        fun of(conversation: Conversation, aiMessage: ChatMessage, tokenUsage: RagTokenUsage?): ChatSendResponse {
+        fun of(result: ChatSendResult): ChatSendResponse {
             return ChatSendResponse(
-                conversationId = conversation.id,
-                messageId = aiMessage.id,
-                answer = aiMessage.content,
-                sources = aiMessage.sources.map {
+                conversationId = result.conversation.id,
+                messageId = result.aiMessage.id,
+                answer = result.aiMessage.content,
+                sources = result.aiMessage.sources.map {
                     SourceInfo(
                         type = it.sourceType,
                         name = it.sourceName,
@@ -27,8 +26,8 @@ data class ChatSendResponse(
                         snippet = it.snippet,
                     )
                 },
-                tokenUsage = tokenUsage?.let { TokenUsage(it.inputTokens, it.outputTokens) },
-                createdAt = aiMessage.createdAt,
+                tokenUsage = result.tokenUsage?.let { TokenUsage(it.inputTokens, it.outputTokens) },
+                createdAt = result.aiMessage.createdAt,
             )
         }
     }

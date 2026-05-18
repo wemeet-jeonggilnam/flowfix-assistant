@@ -1,9 +1,11 @@
 package com.wemeet.flowfixassistant.chat.presentation
 
-import com.wemeet.flowfixassistant.common.presentation.ApiResponse
-import com.wemeet.flowfixassistant.common.infrastructure.security.UserPrincipal
+import com.wemeet.flowfixassistant.chat.application.service.ChatService
 import com.wemeet.flowfixassistant.chat.presentation.dto.*
-import com.wemeet.flowfixassistant.chat.application.ChatService
+import com.wemeet.flowfixassistant.common.infrastructure.security.UserPrincipal
+import com.wemeet.flowfixassistant.common.presentation.ApiResponse
+import jakarta.validation.Valid
+import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
@@ -14,23 +16,26 @@ class ChatController(
 ) {
     @PostMapping
     fun chat(
-        @RequestBody request: ChatSendRequest,
+        @Valid @RequestBody request: ChatSendRequest,
         @AuthenticationPrincipal principal: UserPrincipal,
-    ): ApiResponse<ChatSendResponse> {
-        return ApiResponse.ok(chatService.chat(request, principal.user.id))
+    ): ResponseEntity<ApiResponse<ChatSendResponse>> {
+        val result = chatService.chat(request.toCommand(), principal.user.id)
+        return ApiResponse.ok(ChatSendResponse.of(result))
     }
 
     @GetMapping("/conversations")
     fun getConversations(
         @AuthenticationPrincipal principal: UserPrincipal,
-    ): ApiResponse<List<ConversationListResponse>> {
-        return ApiResponse.ok(chatService.getConversations(principal.user.id))
+    ): ResponseEntity<ApiResponse<ConversationListResponse>> {
+        val result = chatService.getConversations(principal.user.id)
+        return ApiResponse.ok(ConversationListResponse.from(result))
     }
 
     @GetMapping("/conversations/{conversationId}/messages")
     fun getMessages(
         @PathVariable conversationId: Long,
-    ): ApiResponse<List<MessageListResponse>> {
-        return ApiResponse.ok(chatService.getMessages(conversationId))
+    ): ResponseEntity<ApiResponse<MessageListResponse>> {
+        val result = chatService.getMessages(conversationId)
+        return ApiResponse.ok(MessageListResponse.from(result))
     }
 }
