@@ -79,7 +79,8 @@ presentation → application → domain ← infrastructure
 - Application Service는 도메인 객체 또는 Application DTO를 반환, Presentation DTO 직접 사용 금지
 - Request → Command 변환은 `Request.toCommand()` 메서드로 Request DTO 내부에서 처리
 - Controller에서 도메인/Result → Response 변환은 `Response.of()` 또는 `Response.from()` 팩토리 메서드 사용
-- Controller 메서드 패턴: `val result = service.xxx(...)` → `return ApiResponse.ok(XxxResponse.of/from(result))`
+- Controller 메서드 패턴: `return XxxResponse.of/from(service.xxx(...)).toSuccessResponse()` (중간 변수 없이 체이닝)
 - RAG 등 외부 API DTO는 `application/dto/`에 위치 (`RagRequest`, `RagResponse`)
-- API 응답은 `ResponseEntity<ApiResponse<T>>`로 통일
+- API 응답은 `T.toSuccessResponse()` 확장 함수 사용 (`ResponseEntity<ApiResponse<T>>` 반환)
 - Request 검증은 `@Valid` + Jakarta Validation 어노테이션 사용 (`@NotBlank`, `@Size` 등)
+- Service의 public 메서드에는 KDoc 주석 작성: 메서드 설명, `@param`, `@return` 포함 (한국어)

@@ -2,6 +2,7 @@ package com.wemeet.flowfixassistant.user.presentation
 
 import com.wemeet.flowfixassistant.common.infrastructure.security.JwtTokenProvider
 import com.wemeet.flowfixassistant.common.presentation.ApiResponse
+import com.wemeet.flowfixassistant.common.presentation.toSuccessResponse
 import com.wemeet.flowfixassistant.user.application.UserService
 import com.wemeet.flowfixassistant.user.presentation.dto.LoginRequest
 import com.wemeet.flowfixassistant.user.presentation.dto.SignUpRequest
@@ -24,15 +25,17 @@ class AuthController(
     @PostMapping("/signup")
     fun signUp(@Valid @RequestBody request: SignUpRequest): ResponseEntity<ApiResponse<TokenResponse>> {
         val user = userService.getOrCreateUser(request.username, request.displayName)
-        val token = jwtTokenProvider.generateToken(user.username, user.role)
-        return ApiResponse.ok(TokenResponse.of(user, token))
+        return TokenResponse.of(
+            user, jwtTokenProvider.generateToken(user.username, user.role)
+        ).toSuccessResponse()
     }
 
     @PostMapping("/login")
     fun login(@Valid @RequestBody request: LoginRequest): ResponseEntity<ApiResponse<TokenResponse>> {
         userDetailsService.loadUserByUsername(request.username)
         val user = userService.getOrCreateUser(request.username)
-        val token = jwtTokenProvider.generateToken(user.username, user.role)
-        return ApiResponse.ok(TokenResponse.of(user, token))
+        return TokenResponse.of(
+            user, jwtTokenProvider.generateToken(user.username, user.role)
+        ).toSuccessResponse()
     }
 }

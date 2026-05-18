@@ -15,9 +15,32 @@ class ChatService(
     private val ragClient: RagClient,
 ) {
 
-    fun chat(command: ChatSendCommand, userId: Long): ChatSendResult {
-        val conversation = getOrCreateConversation(command.conversationId, userId)
+    /**
+     * 새 대화를 생성하고 첫 메시지를 처리합니다.
+     *
+     * @param command 채팅 전송 명령
+     * @param userId 사용자 ID
+     * @return 채팅 전송 결과 (대화, AI 응답, 토큰 사용량)
+     */
+    fun createConversation(command: ChatSendCommand, userId: Long): ChatSendResult {
+        val conversation = conversationRepository.save(Conversation(userId = userId))
+        return processChat(conversation, command, userId)
+    }
 
+    /**
+     * 기존 대화에 메시지를 전송하고 AI 응답을 반환합니다.
+     *
+     * @param conversationId 대화 ID
+     * @param command 채팅 전송 명령
+     * @param userId 사용자 ID
+     * @return 채팅 전송 결과 (대화, AI 응답, 토큰 사용량)
+     */
+    fun sendMessage(conversationId: Long, command: ChatSendCommand, userId: Long): ChatSendResult {
+        val conversation = findConversation(conversationId)
+        return processChat(conversation, command, userId)
+    }
+
+    private fun processChat(conversation: Conversation, command: ChatSendCommand, userId: Long): ChatSendResult {
         // 사용자 메시지 저장 (dirty checking)
         conversation.addMessage(ChatMessage.ofUser(conversation, command.message))
 
@@ -47,24 +70,31 @@ class ChatService(
         return ChatSendResult(conversation = conversation, aiMessage = aiMessage, tokenUsage = ragResponse.tokenUsage)
     }
 
+    /**
+     * 사용자의 대화 목록을 최신순으로 조회합니다.
+     *
+     * @param userId 사용자 ID
+     * @return 대화 목록
+     */
     @Transactional(readOnly = true)
     fun getConversations(userId: Long): List<Conversation> {
         return conversationRepository.findByUserIdOrderByUpdatedAtDesc(userId)
     }
 
+    /**
+     * 대화의 메시지 목록을 조회합니다.
+     *
+     * @param conversationId 대화 ID
+     * @return 메시지를 포함한 대화
+     */
     @Transactional(readOnly = true)
     fun getMessages(conversationId: Long): Conversation {
+        return findConversation(conversationId)
+    }
+
+    private fun findConversation(conversationId: Long): Conversation {
         return conversationRepository.findById(conversationId).orElseThrow {
             IllegalArgumentException("대화를 찾을 수 없습니다: $conversationId")
         }
-    }
-
-    private fun getOrCreateConversation(conversationId: Long?, userId: Long): Conversation {
-        if (conversationId != null) {
-            return conversationRepository.findById(conversationId).orElseThrow {
-                IllegalArgumentException("대화를 찾을 수 없습니다: $conversationId")
-            }
-        }
-        return conversationRepository.save(Conversation(userId = userId))
     }
 }

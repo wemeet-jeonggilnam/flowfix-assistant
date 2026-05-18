@@ -8,10 +8,8 @@ data class ChatSendRequest(
     @field:NotBlank(message = "메시지는 필수입니다.")
     @field:Size(max = 5000, message = "메시지는 5000자 이내로 입력해주세요.")
     val message: String,
-
-    val conversationId: Long? = null,
 ) {
     fun toCommand(): ChatSendCommand {
-        return ChatSendCommand(message = message, conversationId = conversationId)
+        return ChatSendCommand(message = message)
     }
 }
