@@ -2,13 +2,13 @@ package com.wemeet.flowfixassistant.conversation.presentation
 
 import com.wemeet.flowfixassistant.conversation.application.service.ChatService
 import com.wemeet.flowfixassistant.conversation.presentation.dto.*
-import com.wemeet.flowfixassistant.user.infrastructure.security.UserPrincipal
 import com.wemeet.flowfixassistant.common.presentation.ApiResponse
 import com.wemeet.flowfixassistant.common.presentation.toSuccessResponse
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -19,10 +19,10 @@ class ChatController(
     @PostMapping
     fun createConversation(
         @Valid @RequestBody request: ChatSendRequest,
-        @AuthenticationPrincipal principal: UserPrincipal,
+        @AuthenticationPrincipal(expression = "user.id") userId: Long,
     ): ResponseEntity<ApiResponse<ChatSendResponse>> {
         return ChatSendResponse.of(
-            chatService.createConversation(request.toCommand(), principal.user.id)
+            chatService.createConversation(request.toCommand(), userId)
         ).toSuccessResponse(HttpStatus.CREATED)
     }
 
@@ -30,19 +30,19 @@ class ChatController(
     fun sendMessage(
         @PathVariable conversationId: Long,
         @Valid @RequestBody request: ChatSendRequest,
-        @AuthenticationPrincipal principal: UserPrincipal,
+        @AuthenticationPrincipal(expression = "user.id") userId: Long,
     ): ResponseEntity<ApiResponse<ChatSendResponse>> {
         return ChatSendResponse.of(
-            chatService.sendMessage(conversationId, request.toCommand(), principal.user.id)
+            chatService.sendMessage(conversationId, request.toCommand(), userId)
         ).toSuccessResponse()
     }
 
     @GetMapping
     fun getConversations(
-        @AuthenticationPrincipal principal: UserPrincipal,
+        @AuthenticationPrincipal(expression = "user.id") userId: Long,
     ): ResponseEntity<ApiResponse<ConversationListResponse>> {
         return ConversationListResponse.from(
-            chatService.getConversations(principal.user.id)
+            chatService.getConversations(userId)
         ).toSuccessResponse()
     }
 

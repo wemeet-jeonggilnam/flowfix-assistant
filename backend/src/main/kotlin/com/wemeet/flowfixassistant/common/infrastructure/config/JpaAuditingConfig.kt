@@ -1,6 +1,5 @@
 package com.wemeet.flowfixassistant.common.infrastructure.config
 
-import com.wemeet.flowfixassistant.user.infrastructure.security.UserPrincipal
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.domain.AuditorAware
@@ -16,8 +15,8 @@ class JpaAuditingConfig {
     fun auditorAware(): AuditorAware<String> {
         return AuditorAware {
             val authentication = SecurityContextHolder.getContext().authentication
-            if (authentication != null && authentication.principal is UserPrincipal) {
-                Optional.of((authentication.principal as UserPrincipal).username)
+            if (authentication != null && authentication.isAuthenticated && authentication.name != null) {
+                Optional.of(authentication.name)
             } else {
                 Optional.of("system")
             }

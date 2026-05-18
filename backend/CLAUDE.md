@@ -41,11 +41,11 @@ src/main/kotlin/com/wemeet/flowfixassistant/
 │   │   └── repository/         # 순수 인터페이스 (JPA 의존 없음)
 │   └── infrastructure/
 │       ├── persistence/jpa/    # JpaAssistantUserRepository
-│       └── security/           # JwtTokenProvider, JwtAuthenticationFilter, UserPrincipal, CustomUserDetailsService
+│       └── security/           # SecurityConfig, JwtTokenProvider, JwtAuthenticationFilter, UserPrincipal, CustomUserDetailsService
 ├── common/
 │   ├── domain/                 # BaseEntity (@MappedSuperclass)
 │   ├── presentation/           # ApiResponse, GlobalExceptionHandler
-│   └── infrastructure/config/  # CorsConfig, JpaAuditingConfig, RestClientConfig, SecurityConfig, WebSocketConfig
+│   └── infrastructure/config/  # CorsConfig, JpaAuditingConfig, RestClientConfig, WebSocketConfig
 └── FlowfixAssistantApplication.kt
 
 src/main/resources/application.yaml
